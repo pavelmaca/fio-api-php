@@ -87,7 +87,15 @@ class Downloader
             throw $e;
         }
 
-        return TransactionList::create(json_decode($response->getBody())->accountStatement);
+        $responseBody = $response->getBody();
+        if (empty($responseBody)) {
+            throw new InternalErrorException(
+                'Server returned empty response (probably maintenance)',
+                503
+            );
+        }
+
+        return TransactionList::create(json_decode($responseBody)->accountStatement);
     }
 
     /**
